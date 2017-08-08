@@ -1,0 +1,248 @@
+---------------------------CREDENCIALES-----------------------------------
+    ssh root@174.138.40.10
+	IP 174.138.40.10
+	MYSQL root asdf1212
+
+---------------------------CREACION DROPLET-------------------------------
+	--CREAR DROPLET
+
+		-crear seleccionando una clave shh, copiar y pegar en config
+		-cat ~/.ssh/id_rsa.pub 
+		-por windows acceder a droplet con putty con nuestro ssh
+
+		--AGREGAR DOMINIO
+		-agregar dominio asignar @ EN A y www en HOSTNAME
+		-apuntar desde nic.cl a dns de digitalocean ->https://www.whatsmydns.ne
+
+---------------------------VESTACP --------------------------
+	como root
+	 apt-get update && apt-get upgrade && apt-get dist-upgrade
+	 wget https://vestacp.com/pub/vst-install.sh
+	 bash vst-install.sh -f
+
+	 https://ricardoahernandez.cl:8083
+	 username: admin
+	password: JMvG9W2Rut
+
+
+	-CORREOS 
+	 	http://DOMINIO-or-IP-address/webmail/
+	 	contacto@ricardoahernandez.cl asdf1212
+	-FTP: mismo user y pass de panel, se pueden crear cuentas adicionales
+		ricardoahernandez.cl
+		admin 
+		X5pcIw74Ey
+
+	-MYSQL:CREAR USUARIO Y BD
+	 	localhost 
+	 	admin_pruebas 
+	 	admin_prueba 
+	 	wbisn6lBI7
+	 
+	-CRON 
+	    wget http://ricardoahernandez.cl/cron.php 
+
+
+	--CAMBIAR URL PHPMYADMIN
+		nano /etc/phpmyadmin/apache2.conf or nano /etc/phpmyadmin/apache.conf
+		Alias /phpmyadmin /usr/share/phpmyadmin
+		cambiar por Alias /private_phpmyadmin /usr/share/phpmyadmin
+
+		nano /usr/local/vesta/web/templates/admin/list_db.html
+		if ($data[$key]['TYPE'] == 'mysql') $db_admin_link = "http://".$http_host."/phpmyadmin/"; 
+		cambiar por
+		if ($data[$key]['TYPE'] == 'mysql') $db_admin_link = "http://".$http_host."/private_phpmyadmin/";
+
+		nano /usr/local/vesta/web/templates/user/list_db.html
+		if ($data[$key]['TYPE'] == 'mysql') $db_admin_link = "http://".$http_host."/phpmyadmin/";
+		cambiar por
+		if ($data[$key]['TYPE'] == 'mysql') $db_admin_link = "http://".$http_host."/private_phpmyadmin/";
+
+		restart apache
+		/etc/init.d/apache2 restart
+
+    
+    -- SUBDOMINIOS
+
+		VestaCP->Web->agregar nuevo dominio -> intra.ricardoahernandez.cl(con dns support., apuntar a ip de server)
+		DigitalOcean->Networking->Domains
+		agregar 
+
+		A       intra           IP
+		A       www.intra       IP
+		CNAME   *.intra         intra.ricardoahernandez.cl.
+
+
+
+
+	-- HTTPS (letsencrypt)
+
+		https://github.com/interbrite/letsencrypt-vesta
+
+
+		cd /usr/local
+		    git clone https://github.com/certbot/certbot.git
+		    git clone https://github.com/interbrite/letsencrypt-vesta.git
+		    mkdir -p /etc/letsencrypt/webroot
+		    ln -s /usr/local/certbot/certbot-auto /usr/local/bin/certbot-auto
+		    ln -s /usr/local/letsencrypt-vesta/letsencrypt-vesta /usr/local/bin/letsencrypt-vesta
+		    ln -s /usr/local/letsencrypt-vesta/letsencrypt.conf /etc/apache2/conf.d/letsencrypt.conf
+
+		MODIFICAR
+			/usr/local/letsencrypt-vesta/letsencrypt-vesta
+
+			-        HAS_CERT=`$VESTA_PATH/bin/v-get-web-domain-value $USER $DOMAIN SSL`
+			-        if [[ $HAS_CERT == 'no' ]]
+			+        HAS_CERT=`$VESTA_PATH/bin/v-list-web-domain-ssl $USER $DOMAIN`
+			+        if [[ $HAS_CERT == '' ]]
+
+
+		service apache2 restart
+		letsencrypt-vesta admin ricardoahernandez.cl
+		service apache2 restart
+
+		IR A VESTAPANEL Y MODIFICAR EN SECCION WEB, AGREGAR SSL POR LETS ENCRIPT, SI TIRA ERROR DESACTIVAR NGINX
+
+		https phpmyadmin
+			sudo nano /etc/phpmyadmin/config.inc.php
+			$cfg['ForceSSL'] = true;
+
+		htaccess para redireccionar a https
+			RewriteEngine On
+			RewriteCond %{HTTPS} off
+			RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI}
+
+
+
+	
+---------------------------VESTACP --------------------------
+		como root
+		 apt-get update && apt-get upgrade && apt-get dist-upgrade
+		 wget https://vestacp.com/pub/vst-install.sh
+		 bash vst-install.sh
+
+		 https://DOMINIO-or-IP-address:8083
+		 https://ricardoahernandez.cl:8083
+		 username: admin
+		 password: X5pcIw74Ey
+
+
+		-CORREOS 
+		 	http://DOMINIO-or-IP-address/webmail/
+		 	contacto@ricardoahernandez.cl asdf1212
+		-FTP: mismo user y pass de panel, se pueden crear cuentas adicionales
+			ricardoahernandez.cl
+			admin 
+			X5pcIw74Ey
+
+		-MYSQL:CREAR USUARIO Y BD
+		 	localhost 
+		 	admin_pruebas 
+		 	admin_prueba 
+		 	wbisn6lBI7
+		 
+		-CRON 
+		    wget http://ricardoahernandez.cl/cron.php 
+
+		-CAMBIAR PUERTO POR DEFECTO 8083
+			ir al firewall del panel y agregar rule
+			ACCEPT
+			TCP
+			NUEVO PUERTO
+			0.0.0.0/0
+
+			guardar e ir a consola
+
+			editor /usr/local/vesta/nginx/conf/nginx.conf
+			buscar 
+				# Vhost
+		   		server {
+		        listen          NUEVO PUERTO;
+		        
+		    /etc/init.d/vesta restart
+
+
+		--CAMBIAR URL PHPMYADMIN
+			nano /etc/phpmyadmin/apache2.conf or nano /etc/phpmyadmin/apache.conf
+			Alias /phpmyadmin /usr/share/phpmyadmin
+			cambiar por Alias /private_phpmyadmin /usr/share/phpmyadmin
+
+			nano /usr/local/vesta/web/templates/admin/list_db.html
+			if ($data[$key]['TYPE'] == 'mysql') $db_admin_link = "http://".$http_host."/phpmyadmin/"; 
+			cambiar por
+			if ($data[$key]['TYPE'] == 'mysql') $db_admin_link = "http://".$http_host."/private_phpmyadmin/";
+
+			nano /usr/local/vesta/web/templates/user/list_db.html
+			if ($data[$key]['TYPE'] == 'mysql') $db_admin_link = "http://".$http_host."/phpmyadmin/";
+			cambiar por
+			if ($data[$key]['TYPE'] == 'mysql') $db_admin_link = "http://".$http_host."/private_phpmyadmin/";
+
+			restart apache
+			/etc/init.d/apache2 restart
+
+	    
+	    -- SUBDOMINIOS
+
+			VestaCP->Web->agregar nuevo dominio -> intra.ricardoahernandez.cl(con dns support., apuntar a ip de server)
+			DigitalOcean->Networking->Domains
+			agregar 
+
+			A       intra           IP
+			A       www.intra       IP
+			CNAME   *.intra         intra.ricardoahernandez.cl.
+
+
+		-- HTTPS (letsencrypt)
+
+			https://github.com/interbrite/letsencrypt-vesta
+
+
+			cd /usr/local
+			    git clone https://github.com/certbot/certbot.git
+			    git clone https://github.com/interbrite/letsencrypt-vesta.git
+			    mkdir -p /etc/letsencrypt/webroot
+			    ln -s /usr/local/certbot/certbot-auto /usr/local/bin/certbot-auto
+			    ln -s /usr/local/letsencrypt-vesta/letsencrypt-vesta /usr/local/bin/letsencrypt-vesta
+			    ln -s /usr/local/letsencrypt-vesta/letsencrypt.conf /etc/apache2/conf.d/letsencrypt.conf
+
+			MODIFICAR
+				/usr/local/letsencrypt-vesta/letsencrypt-vesta
+
+				-        HAS_CERT=`$VESTA_PATH/bin/v-get-web-domain-value $USER $DOMAIN SSL`
+				-        if [[ $HAS_CERT == 'no' ]]
+				+        HAS_CERT=`$VESTA_PATH/bin/v-list-web-domain-ssl $USER $DOMAIN`
+				+        if [[ $HAS_CERT == '' ]]
+
+
+			service apache2 restart
+			letsencrypt-vesta admin ricardoahernandez.cl
+			service apache2 restart
+			IR A VESTAPANEL Y MODIFICAR EN SECCION WEB, AGREGAR SSL POR LETS ENCRIPT, SI TIRA ERROR DESACTIVAR NGINX
+	        
+			-CREAR MAS DE 1 CERTIFICADO PARA SUBDOMINIOS,ETC
+
+				https://github.com/interbrite/letsencrypt-vesta
+				letsencrypt-vesta admin intra.ricardoahernandez.cl
+				service apache2 restart
+				/usr/local/vesta/bin/v-rebuild-web-domains admin
+		        service nginx restart
+
+
+
+
+			https phpmyadmin
+				sudo nano /etc/phpmyadmin/config.inc.php
+				$cfg['ForceSSL'] = true;
+
+			htaccess para redireccionar a https
+				RewriteEngine On
+				RewriteCond %{HTTPS} off
+				RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI}
+
+
+
+		
+
+
+
+

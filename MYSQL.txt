@@ -1,0 +1,615 @@
+-CONSOLA
+	mysql -u root -p
+    sudo service mysql restart
+
+-STRICT_TRANS_TABLES
+	sudo nano /etc/mysql/my.cnf
+	Add this to the end of the file
+	[mysqld]  
+	sql_mode = "STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION"
+
+	mysql> set global sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION';
+	
+	mysql> set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION';
+		
+-REPLACE
+	update actividades_movistar SET precio_target=TRIM(REPLACE(REPLACE(REPLACE(REPLACE(precio_target, '-', ' ') , '$', ' ') , '.', ' ') , ' ', ''))
+
+		
+	update speedtestkm set rut_cliente = concat(substring(rut_cliente,1,char_length(rut_cliente)-1),"-",substr(rut_cliente,-1))
+
+	update actividades_movistar SET valor_con_iva=TRIM(REPLACE(REPLACE(valor_con_iva, '-', ' ') , '$', ' '))  where id=487
+
+
+-EXPORTAR ARCHIVO
+
+	chmod 777 /var/lib/mysql-files/												   
+	load data infile "/var/lib/mysql-files/mat.csv" 
+	into table bodega_materiales
+	CHARACTER SET UTF8
+	fields terminated by ';'
+	lines terminated by '\n';
+
+
+	The only "easy way" of doing this is as follows. First, realize that there is a difference between what is displayed and what is kept hidden in the Excel .csv file.
+
+	(1) Open an Excel file where you have the info (.xls, .xlsx)
+
+	(2) In Excel, choose "CSV (Comma Delimited) (*.csv) as the file type and save as that type.
+
+	(3) In NOTEPAD (found under "Programs" and then Accessories in Start menu), open the saved .csv file in Notepad
+
+	(4) Then choose -> Save As..and at the bottom of the "save as" box, there is a select box labelled as "Encoding". Select UTF-8 (do NOT use ANSI or you lose all accents etc). After selecting UTF-8, then save the file to a slightly different file name from the original.
+
+	This file is in UTF-8 and retains all characters and accents and can be imported, for example, into MySQL and other database programs.
+
+-CARACTERES
+	ALTER TABLE `factibilidad` CONVERT TO CHARACTER SET utf8 COLLATE utf8_spanish_ci 
+
+-PROCEDURE INSERT WHILE
+
+	drop procedure if exists doWhile;
+	DELIMITER //  
+	CREATE PROCEDURE doWhile()   
+	BEGIN
+	DECLARE i INT DEFAULT 101;
+	WHILE (i <= 300) DO
+	    INSERT INTO `mantencion30_nodos` (id,titulo) values (i,i);
+	    SET i = i+1;
+	END WHILE;
+	END
+	//  
+	call doWhile();
+
+
+
+-QUERY SPEEDTEST
+
+	SELECT orden_trabajo as folio,fecha from `speedtestkm` WHERE fecha BETWEEN "2016-11-01" and "2016-11-13" ORDER BY orden_trabajo desc,fecha desc 
+
+	SELECT orden as folio,DATE_FORMAT(STR_TO_DATE(fecha, '%d-%m-%Y'), '%Y-%m-%d') as fecha FROM `speedtestvtr` WHERE DATE_FORMAT(STR_TO_DATE(fecha, '%d-%m-%Y'), '%Y-%m-%d') BETWEEN "2016-11-01" and "2016-11-13" ORDER BY folio DESC 
+
+	select stk.id,orden_trabajo as 'Folio OT(KM)',stk.numero_folio as 'Folio tango(KM)',stv.id_orden as 'Folio tango(VTR)' from speedtestkm stk  join speed_test_vtr stv on stv.id_orden = replace(numero_folio,'.','') where stk.fecha BETWEEN "2016-11-01" and "2016-11-13" and stv.id = null
+
+	select 
+	stk.id,
+	orden_trabajo as 'Folio OT(KM)',
+	stk.numero_folio as 'Folio tango(KM)',
+	stv.orden as 'Folio tango(VTR)' 
+	from speedtestkm stk  
+	left join speedtestvtr stv 
+	on stv.orden = numero_folio
+	where stk.fecha BETWEEN "2016-11-01" and "2016-11-13" 
+
+
+TRIGGERS
+
+	CREATE TRIGGER usuario_vacaciones
+	AFTER INSERT
+	   ON usuario FOR EACH ROW
+	BEGIN
+
+	 INSERT INTO vacaciones_usuario
+	   (rut_usuario)
+	   VALUES
+	   ( NEW.rut);
+	     
+	     
+	END; 
+
+	DELIMITADOR //
+
+
+	sublime 
+	emmet->#page>(#header>ul#nav>li*4>a)+(#content>h1{Hello world}+p)+#footer
+	color->control+shift+c
+
+	https://www.microsoft.com/genuine/validate/DownloadValidationSupport.aspx?displaylang=es&sGuid=21f81a9a-0443-484d-8045-0dbae0ff5221
+
+	CREATE TRIGGER tecnicos_trigger 
+	BEFORE UPDATE ON vehiculos
+	  FOR EACH ROW
+	  BEGIN
+	  INSERT INTO vehiculos_historial VALUES(null,
+	  NEW.id,
+	  NEW.patente,
+	  NEW.digito_verificador,
+	  NEW.marca,
+	  NEW.modelo,
+	  NEW.tipo_vehiculo,
+	  NEW.cilindrada,
+	  NEW.anio,
+	  NEW.color,
+	  NEW.numero_motor,
+	  NEW.numero_chasis,
+	  NEW.propietario,
+	  NEW.seguro,
+	  NEW.poliza_seguro,
+	  NEW.vencimiento_seguro,
+	  NEW.municipalidad,
+	  NEW.tag,
+	  NEW.combustible,
+	  NEW.tarjeta_combustible,
+	  NEW.numero_tarjeta_combustible,
+	  NEW.clave_tarjeta_combustible,
+	  NEW.revision_tecnica,
+	  NEW.certificado_de_emisiones_contaminantes,
+	  NEW.extintor,
+	  NEW.fecha_vencimiento_extintor,
+	  NEW.rueda_de_repuesto,
+	  NEW.gata,
+	  NEW.llave_de_rueda,
+	  NEW.botiquin,
+	  NEW.porta_escalas,
+	  NEW.triangulo,
+	  NEW.conos,
+	  NEW.radio,
+	  NEW.proximo_cambio_de_aceite,
+	  NEW.kilometraje_actual,
+	  NEW.estado,
+	  NEW.observaciones,
+	  NEW.chaleco_reflectante,
+	  NOW(),
+	  NEW.gps,
+	  NEW.gps_numero,
+	  NEW.gps_octanos,
+	  NEW.logo);
+	  END;
+
+
+	TRIGGERS
+
+		CREATE TRIGGER tecnicos_trigger 
+		BEFORE UPDATE ON tecnicos 
+		FOR EACH ROW 
+		BEGIN 
+		 IF (NEW.id_vehiculo != NEW.id_vehiculo) THEN
+		      INSERT INTO tecnicos_historial VALUES(null, 
+		      NEW.id,
+		      NEW.rut_usuario,
+		      NEW.id_vehiculo,
+		      NOW(),
+		      NEW.observaciones);
+		 END IF;
+		END
+
+		CREATE TRIGGER tecnicos_insert_trigger 
+		AFTER INSERT ON tecnicos 
+		FOR EACH ROW 
+		BEGIN 
+		      INSERT INTO tecnicos_historial VALUES(null, 
+		      NEW.id,
+		      NEW.rut_usuario,
+		      NEW.id_vehiculo,
+		      NOW(),
+		      NEW.observaciones);
+		END
+
+
+		CREATE TRIGGER servicios_mod_trigger 
+		BEFORE UPDATE ON servicios
+		  FOR EACH ROW
+		  BEGIN
+		  INSERT INTO servicios_modificaciones VALUES(null,
+		  NEW.id,
+		  NEW.avt,
+		  NEW.id_movil,
+		  NEW.id_hotel,
+		  NEW.fecha_solicitud,
+		  NEW.hora_solicitud,
+		  NEW,fecha_realizacion, 
+		  NEW.hora_realizacion,
+		  NEW.id_funcionario,
+		  NEW.huesped,
+		  NEW.direccion_huesped,
+		  NEW.ubicacion,
+		  NEW.destino,
+		  NEW.vuelo,
+		  NEW.cantidad_pasajeros,
+		  NEW.tipo_servicio,
+		  NEW.comentario,
+		  NEW.monto,
+		  NEW.forma_de_pago,
+		  NEW.quien_solicita,
+		  NEW.creado_por,
+		  NEW.ultima_actualizacion,
+		  NEW.visto,
+		  NEW.enviado,
+		  NEW.observaciones,
+		  NEW.tipo_observacion,
+		  NOW());
+		  END
+
+
+-COMUNAS REGIONES
+		
+		
+CREATE TABLE IF NOT EXISTS `region` (
+  `id` int(11) NOT NULL auto_increment,
+  `nombre` varchar(255) NOT NULL,
+  PRIMARY KEY  (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=16 ;
+
+--
+-- Volcar la base de datos para la tabla `sgia_region`
+--
+
+INSERT INTO `region` (`id`, `nombre`) VALUES
+(1, 'XV de Arica y Parinacota'),
+(2, 'I de TarapacÃ¡'),
+(3, 'II de Antofagasta'),
+(4, 'III de Atacama'),
+(5, 'IV de Coquimbo'),
+(6, 'V de ValparaÃ­so'),
+(7, 'VI del Libertador General Bernardo O''Higgins'),
+(8, 'VII del Maule'),
+(9, 'VIII del BiobÃ­o'),
+(10, 'IX de la AraucanÃ­a'),
+(11, 'XIV de los RÃ­os'),
+(12, 'X de los Lagos'),
+(13, 'XI AysÃ©n del General Carlos IbÃ¡Ã±ez del Campo'),
+(14, 'XII de Magallanes y AntÃ¡rtica Chilena'),
+(15, 'Metropolitana de Santiago');
+
+
+
+CREATE TABLE IF NOT EXISTS `comunas_full` (
+  `id` int(11) NOT NULL auto_increment,
+  `nombre` varchar(255) NOT NULL,
+  `region_id` int(11) NOT NULL,
+  PRIMARY KEY  (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=347 ;
+
+--
+-- Volcar la base de datos para la tabla `sgia_comunas_full`
+--
+
+INSERT INTO `comunas_full` (`id`, `nombre`, `region_id`) VALUES
+(1, 'Arica ', 1),
+(2, 'Camarones', 1),
+(3, 'Putre ', 1),
+(4, 'General Lagos', 1),
+(5, 'Alto Hospicio', 2),
+(6, 'Iquique', 2),
+(7, 'Huara', 2),
+(8, 'CamiÃ±a', 2),
+(9, 'Colchane', 2),
+(10, 'Pica', 2),
+(11, 'Pozo Almonte', 2),
+(12, 'Tocopilla ', 3),
+(13, 'MarÃ­a Elena', 3),
+(14, 'Calama ', 3),
+(15, 'OllagÃ¼e', 3),
+(16, 'San Pedro de Atacama', 3),
+(17, 'Antofagasta ', 3),
+(18, 'Mejillones ', 3),
+(19, 'Sierra Gorda ', 3),
+(20, 'Taltal', 3),
+(21, 'ChaÃ±aral', 4),
+(22, 'Diego de Almagro ', 4),
+(23, 'CopiapÃ³', 4),
+(24, 'Caldera ', 4),
+(25, 'Tierra Amarilla', 4),
+(26, 'Vallenar ', 4),
+(27, 'Freirina ', 4),
+(28, 'Huasco ', 4),
+(29, 'Alto del Carmen', 4),
+(30, 'La Serena ', 5),
+(31, 'La Higuera ', 5),
+(32, 'Coquimbo ', 5),
+(33, 'Andacollo ', 5),
+(34, 'VicuÃ±a', 5),
+(35, 'Paihuano', 5),
+(36, 'Ovalle ', 5),
+(37, 'RÃ­o Hurtado', 5),
+(38, 'Monte Patria ', 5),
+(39, 'Combarbal', 5),
+(40, 'Punitaqui', 5),
+(41, 'Illapel ', 5),
+(42, 'Salamanca ', 5),
+(43, 'Los Vilos ', 5),
+(44, 'Canela', 5),
+(45, 'La Ligua ', 6),
+(46, 'Petorca ', 6),
+(47, 'Cabildo ', 6),
+(48, 'Zapallar ', 6),
+(49, 'Papudo', 6),
+(50, 'Los Andes ', 6),
+(51, 'San Esteban ', 6),
+(52, 'Calle Larga ', 6),
+(53, 'Rinconada', 6),
+(54, 'San Felipe ', 6),
+(55, 'Putaendo ', 6),
+(56, 'Santa MarÃ­a', 6),
+(57, 'Panquehue ', 6),
+(58, 'Llayllay ', 6),
+(59, 'Catemu', 6),
+(60, 'Quillota ', 6),
+(61, 'La Cruz ', 6),
+(62, 'Calera ', 6),
+(63, 'Nogales ', 6),
+(64, 'Hijuelas ', 6),
+(65, 'Limache ', 6),
+(66, 'OlmuÃ©', 6),
+(67, 'ValparaÃ­so', 6),
+(68, 'ViÃ±a del Mar', 6),
+(69, 'Quintero ', 6),
+(70, 'PuchuncavÃ­', 6),
+(71, 'QuilpuÃ©', 6),
+(72, 'Villa Alemana ', 6),
+(73, 'Casablanca ', 6),
+(74, 'ConcÃ³n', 6),
+(75, 'Juan FernÃ¡ndez', 6),
+(76, 'San Antonio ', 6),
+(77, 'Cartagena ', 6),
+(78, 'El Tabo ', 6),
+(79, 'El Quisco ', 6),
+(80, 'Algarrobo ', 6),
+(81, 'Santo Domingo', 6),
+(82, 'Isla de Pascua', 6),
+(83, 'Rancagua ', 7),
+(84, 'Graneros ', 7),
+(85, 'Mostazal ', 7),
+(86, 'Codegua ', 7),
+(87, 'MachalÃ­', 7),
+(88, 'Olivar ', 7),
+(89, 'Requinoa ', 7),
+(90, 'Rengo ', 7),
+(91, 'Malloa ', 7),
+(92, 'Quinta de Tilcoco ', 7),
+(93, 'San Vicente ', 7),
+(94, 'Pichidegua ', 7),
+(95, 'Peumo ', 7),
+(96, 'Coltauco ', 7),
+(97, 'Coinco ', 7),
+(98, 'DoÃ±ihue', 7),
+(99, 'Las Cabras ', 7),
+(100, 'San Fernando ', 7),
+(101, 'Chimbarongo ', 7),
+(102, 'Placilla ', 7),
+(103, 'Nancagua ', 7),
+(104, 'ChÃ©pica', 7),
+(105, 'Santa Cruz ', 7),
+(106, 'Lolol ', 7),
+(107, 'Pumanque ', 7),
+(108, 'Palmilla ', 7),
+(109, 'Peralillo ', 7),
+(110, 'Pichilemu ', 7),
+(111, 'Navidad ', 7),
+(112, 'Litueche ', 7),
+(113, 'La Estrella ', 7),
+(114, 'Marchihue ', 7),
+(115, 'Paredones', 7),
+(116, 'CuricÃ³', 8),
+(117, 'Teno ', 8),
+(118, 'Romeral ', 8),
+(119, 'Molina ', 8),
+(120, 'Sagrada Familia ', 8),
+(121, 'HualaÃ±Ã©', 8),
+(122, 'LicantÃ©n', 8),
+(123, 'VichuquÃ©n', 8),
+(124, 'Rauco', 8),
+(125, 'Talca ', 8),
+(126, 'Pelarco ', 8),
+(127, 'RÃ­o Claro', 8),
+(128, 'San Clemente ', 8),
+(129, 'Maule ', 8),
+(130, 'San Rafael ', 8),
+(131, 'Empedrado ', 8),
+(132, 'Pencahue ', 8),
+(133, 'ConstituciÃ³n', 8),
+(134, 'Curepto', 8),
+(135, 'Linares ', 8),
+(136, 'Yerbas Buenas ', 8),
+(137, 'ColbÃºn', 8),
+(138, 'LongavÃ­', 8),
+(139, 'Parral ', 8),
+(140, 'Retiro ', 8),
+(141, 'Villa Alegre ', 8),
+(142, 'San Javier ', 8),
+(143, 'Cauquenes ', 8),
+(144, 'Pelluhue ', 8),
+(145, 'Chanco', 8),
+(146, 'ChillÃ¡n', 9),
+(147, 'San Carlos ', 9),
+(148, 'Ã‘iquÃ©n', 9),
+(149, 'San FabiÃ¡n', 9),
+(150, 'Coihueco ', 9),
+(151, 'Pinto ', 9),
+(152, 'San Ignacio ', 9),
+(153, 'El Carmen ', 9),
+(154, 'Yungay ', 9),
+(155, 'Pemuco ', 9),
+(156, 'Bulnes ', 9),
+(157, 'QuillÃ³n', 9),
+(158, 'RÃ¡nquil', 9),
+(159, 'Portezuelo ', 9),
+(160, 'Coelemu ', 9),
+(161, 'Treguaco ', 9),
+(162, 'Cobquecura ', 9),
+(163, 'Quirihue ', 9),
+(164, 'Ninhue ', 9),
+(165, 'San NicolÃ¡s', 9),
+(166, 'ChillÃ¡n Viejo', 9),
+(167, 'Alto BiobÃ­o', 9),
+(168, 'Los Angeles ', 9),
+(169, 'Cabrero ', 9),
+(170, 'Tucapel ', 9),
+(171, 'Antuco ', 9),
+(172, 'Quilleco ', 9),
+(173, 'Santa BÃ¡rbara', 9),
+(174, 'Quilaco ', 9),
+(175, 'MulchÃ©n', 9),
+(176, 'Negrete ', 9),
+(177, 'Nacimiento ', 9),
+(178, 'Laja ', 9),
+(179, 'San Rosendo ', 9),
+(180, 'Yumbel', 9),
+(181, 'ConcepciÃ³n', 9),
+(182, 'Talcahuano ', 9),
+(183, 'Penco ', 9),
+(184, 'TomÃ©', 9),
+(185, 'Florida ', 9),
+(186, 'HualpÃ©n', 9),
+(187, 'Hualqui ', 9),
+(188, 'Santa Juana ', 9),
+(189, 'Lota ', 9),
+(190, 'Coronel ', 9),
+(191, 'San Pedro de la Paz ', 9),
+(192, 'Chiguayante', 9),
+(193, 'Lebu ', 9),
+(194, 'Arauco ', 9),
+(195, 'Curanilahue ', 9),
+(196, 'Los Alamos ', 9),
+(197, 'CaÃ±ete', 9),
+(198, 'Contulmo ', 9),
+(199, 'Tirua ', 9),
+(200, 'Angol ', 10),
+(201, 'Renaico ', 10),
+(202, 'Collipulli ', 10),
+(203, 'Lonquimay ', 10),
+(204, 'CuracautÃ­n', 10),
+(205, 'Ercilla ', 10),
+(206, 'Victoria ', 10),
+(207, 'TraiguÃ©n', 10),
+(208, 'Lumaco ', 10),
+(209, 'PurÃ©n', 10),
+(210, 'Los Sauces', 10),
+(211, 'Temuco ', 10),
+(212, 'Lautaro ', 10),
+(213, 'Perquenco ', 10),
+(214, 'VilcÃºn', 10),
+(215, 'Cholchol', 10),
+(216, 'Cunco ', 10),
+(217, 'Melipeuco ', 10),
+(218, 'Curarrehue ', 10),
+(219, 'PucÃ³n', 10),
+(220, 'Villarrica ', 10),
+(221, 'Freire ', 10),
+(222, 'PitrufquÃ©n', 10),
+(223, 'Gorbea ', 10),
+(224, 'Loncoche ', 10),
+(225, 'ToltÃ©n', 10),
+(226, 'Teodoro Schmidt ', 10),
+(227, 'Saavedra ', 10),
+(228, 'Carahue ', 10),
+(229, 'Nueva Imperial ', 10),
+(230, 'Galvarino ', 10),
+(231, 'Padre las Casas', 10),
+(232, 'Valdivia ', 11),
+(233, 'Mariquina', 11),
+(234, 'Lanco', 11),
+(235, 'MÃ¡fil', 11),
+(236, 'Corral', 11),
+(237, 'Los Lagos', 11),
+(238, 'Panguipulli', 11),
+(239, 'Paillaco', 11),
+(240, 'La UniÃ³n', 11),
+(241, 'Futrono', 11),
+(242, 'RÃ­o Bueno', 11),
+(243, 'Lago Ranco', 11),
+(244, 'Osorno ', 12),
+(245, 'San Pablo ', 12),
+(246, 'Puyehue ', 12),
+(247, 'Puerto Octay ', 12),
+(248, 'Purranque ', 12),
+(249, 'RÃ­o Negro', 12),
+(250, 'San Juan de la Costa', 12),
+(251, 'Puerto Montt ', 12),
+(252, 'Puerto Varas ', 12),
+(253, 'CochamÃ³', 12),
+(254, 'Calbuco ', 12),
+(255, 'MaullÃ­n', 12),
+(256, 'Los Muermos ', 12),
+(257, 'Fresia ', 12),
+(258, 'Llanquihue ', 12),
+(259, 'Frutillar', 12),
+(260, 'Castro ', 12),
+(261, 'Ancud ', 12),
+(262, 'Quemchi ', 12),
+(263, 'Dalcahue ', 12),
+(264, 'Curaco de VÃ©lez', 12),
+(265, 'Quinchao ', 12),
+(266, 'PuqueldÃ³n', 12),
+(267, 'Chonchi ', 12),
+(268, 'QueilÃ©n', 12),
+(269, 'QuellÃ³n', 12),
+(270, 'ChaitÃ©n', 12),
+(271, 'HualaihuÃ©', 12),
+(272, 'FutaleufÃº', 12),
+(273, 'Palena', 12),
+(274, 'Coihaique ', 13),
+(275, 'Lago Verde ', 13),
+(276, 'AisÃ©n', 13),
+(277, 'Cisnes ', 13),
+(278, 'Guaitecas ', 13),
+(279, 'Chile Chico ', 13),
+(280, 'RÃ­o IbÃ¡nez', 13),
+(281, 'Cochrane ', 13),
+(282, 'O''Higgins ', 13),
+(283, 'Tortel', 13),
+(284, 'Natales ', 14),
+(285, 'Torres del Paine ', 14),
+(286, 'Punta Arenas ', 14),
+(287, 'Rio Verde ', 14),
+(288, 'Laguna Blanca ', 14),
+(289, 'San Gregorio ', 14),
+(290, 'Porvenir ', 14),
+(291, 'Primavera ', 14),
+(292, 'Timaukel ', 14),
+(293, 'Cabo de Hornos ', 14),
+(294, 'AntÃ¡rtica', 14),
+(295, 'Santiago ', 15),
+(296, 'Independencia ', 15),
+(297, 'ConchalÃ­', 15),
+(298, 'Huechuraba ', 15),
+(299, 'Recoleta ', 15),
+(300, 'Providencia ', 15),
+(301, 'Vitacura ', 15),
+(302, 'Lo Barnechea ', 15),
+(303, 'Las Condes ', 15),
+(304, 'Ã‘uÃ±oa', 15),
+(305, 'La Reina ', 15),
+(306, 'Macul ', 15),
+(307, 'PeÃ±alolÃ©n', 15),
+(308, 'La Florida ', 15),
+(309, 'San JoaquÃ­n', 15),
+(310, 'La Granja ', 15),
+(311, 'La Pintana ', 15),
+(312, 'San RamÃ³n', 15),
+(313, 'San Miguel ', 15),
+(314, 'La Cisterna ', 15),
+(315, 'El Bosque ', 15),
+(316, 'Pedro Aguirre Cerda ', 15),
+(317, 'Lo Espejo ', 15),
+(318, 'EstaciÃ³n Central', 15),
+(319, 'Cerrillos ', 15),
+(320, 'MaipÃº', 15),
+(321, 'Quinta Normal ', 15),
+(322, 'Lo Prado ', 15),
+(323, 'Pudahuel ', 15),
+(324, 'Cerro Navia ', 15),
+(325, 'Renca ', 15),
+(326, 'Quilicura', 15),
+(327, 'Colina ', 15),
+(328, 'Lampa ', 15),
+(329, 'Tiltil ', 15),
+(330, 'Puente Alto ', 15),
+(331, 'an JosÃ© de Maipo', 15),
+(332, 'Pirque ', 15),
+(333, 'San Bernardo ', 15),
+(334, 'Buin ', 15),
+(335, 'Paine ', 15),
+(336, 'Calera de Tango ', 15),
+(337, 'Melipilla ', 15),
+(338, 'MarÃ­a Pinto', 15),
+(339, 'CuracavÃ­', 15),
+(340, 'AlhuÃ©', 15),
+(341, 'San Pedro ', 15),
+(342, 'Talagante ', 15),
+(343, 'PeÃ±aflor', 15),
+(344, 'Isla de Maipo ', 15),
+(345, 'El Monte ', 15),
+(346, 'Padre Hurtado', 15);
+
+

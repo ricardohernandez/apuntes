@@ -1,0 +1,146 @@
+
+GIT - GITHUB
+   http://blog.santiagobasulto.com.ar/programacion/2011/11/27/tutorial-de-git-en-espanol.html
+
+   git init -> crear repositorio para el proyecto situado
+   add  -> hacer cambios al codigo y agregar (staging index) 
+   commit -> agregar a repositorio.
+   push -> transfiere los cambios al repositorio remoto) o 
+   pull -> obtiene los cambios desde un repositorio remoto).
+
+
+	-CONFIG	
+		sudo apt-get install git-core
+		git config --global user.name "ricardo"
+		git config --global user.email "ricardo.hernandez.esp@gmail.com"
+		git config --global push.default "matching"
+		git config --global color.branch auto
+
+		sudo cat '/home/ricardo/.gitconfig'
+
+	-SSH
+			--para windows usar git bash, crear clave y agregar en github
+			--para agregar mas colaboradores,hacerlo manualmente desde github con el nombre de usuario.
+
+			ver si hay claves ssh
+				ls -al ~/.ssh
+
+			generar con tu correo
+				ssh-keygen -t rsa -b 4096 -C "ricardo.hernandez.esp@gmail.com"
+
+			agregar a ssh-agent
+				eval "$(ssh-agent -s)"
+				ssh-add ~/.ssh/id_rsa
+
+		    pegar clave en github
+				sudo apt-get install xclip
+				xclip -sel clip < ~/.ssh/id_rsa.pub
+
+			probar coneccion
+				ssh -T git@github.com
+
+	-PROCESO
+				
+			mkdir gitbook 
+			cd gitbook		
+			echo "# portafolio" >> README.md
+			git init
+			git git add . or git add README.md  
+			git commit -m 'primer commit'
+
+			-crear repositorio en github si no existe
+			    git remote rm origin //elimina origin en caso q ya exista
+				git remote add origin git@github.com:ricardohernandez/mantencion30.git
+ 				git remote -v -> lista repositorios remotos y su url
+
+			push
+			  git pull origin master //pull down changes from the origin repository as follows before you can push
+		  	  git push -u origin master
+		  	  git push -f origin master	
+
+		    pull
+		      -para hacer copia de proyecto desde otro usuario, debe estar agregado y aceptado como colaborador para tener permiso de escritura.
+		      git pull origin master
+		      -en caso de error urelated
+		      
+		      git pull origin master --allow-unrelated-histories
+
+			      	
+			
+	 	   clone
+		  	  git clone git@github.com:ricardohernandez/portafolio.git
+		  	  git clone --bare https://github.com/ricardohernandez/portafolio.git
+
+			git remote add pb https://github.com/paulboone/ticgit -> agrega otro repositorio
+						
+
+	-COMANDOS
+	    git log
+		git diff
+		
+   
+
+
+	-.gitignore
+		funciona para archivos no agregados (antes del add.)
+
+		# Compiled source #
+		###################
+		*.com
+		*.class
+		*.dll
+		*.exe
+		*.o
+		*.so
+
+		# Packages #
+		############
+		# it's better to unpack these files and commit the raw source
+		# git has its own built in compression methods
+		*.7z
+		*.dmg
+		*.gz
+		*.iso
+		*.jar
+		*.rar
+		*.tar
+		*.zip
+
+		# Logs and databases #
+		######################
+		*.log
+		*.sql
+		*.sqlite
+		*sftp-config.json
+		*application/sftp-config.json
+		application/config/database.php
+
+		# OS generated files #
+		######################
+		.DS_Store
+		.DS_Store?
+		._*
+		.Spotlight-V100
+		.Trashes
+		ehthumbs.db
+		Thumbs.db
+
+		# CODEIGNITER
+
+		*/config/development
+		*/logs/log-*.php
+		!*/logs/index.html
+		*/cache/*
+		!*/cache/index.html
+		!*/cache/.htaccess
+
+		user_guide_src/build/*
+		user_guide_src/cilexer/build/*
+		user_guide_src/cilexer/dist/*
+		user_guide_src/cilexer/pycilexer.egg-info/*
+
+		#codeigniter 3
+		application/logs/*
+		!application/logs/index.html
+		!application/logs/.htaccess
+		/vendor/

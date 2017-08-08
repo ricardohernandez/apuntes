@@ -1,0 +1,387 @@
+INSTALACION
+	-instalar node
+	-instalar git
+	-npm install express --save
+	-npm install express-generator -g
+	-npm install -g nodemon
+	-npm install -g bower
+	-npm install ejs --save
+	-instalar git desde instalador y elejir segunda opcion desde ventana de comando para win
+	-express nombreproyecto && cd nombreproyecto && npm install
+	-package.json -> "start": "nodemon ./bin/www"
+	-npm start
+
+//PRODUCCION
+
+	http://strong-pm.io
+	slc ctl env-set express-example-app NODE_ENV=production
+
+
+
+//VARIOS
+
+	VER OBJETOS COMO STRING
+	var util = require('util');
+	util.inspect(objeto)
+	
+	//DECLARACION CAREPTAS ESTATICAS PARA IMPORTAR
+	app.use("/front",express.static(__dirname + '/assets'));
+
+
+//CARGAR VISTAS DESDE MOTOR JADE
+	/*app.set("view engine","jade");
+	app.get('/', function (req, res) {
+	  res.render('index')
+	})*/
+
+
+//DECLARACION CAREPTAS ESTATICAS PARA IMPORTAR
+    app.use("/front",express.static(__dirname + '/assets'));
+
+// MOTOR DE VISTAS HTML
+	//npm install consolidate
+ 	//npm install swig
+ 	var cons = require('consolidate');
+	var path = require("path");
+	app.engine('html', cons.swig)
+	app.set('views', path.join(__dirname, 'views'));
+	app.set('view engine', 'html');
+
+//CARGAR VISTAS HTML
+
+	app.use(express.static(__dirname + '/views'));
+	  router.get('/', function(req, res, next) {
+	  var datos={
+       titulo:'Articulos disponibles a la fecha',
+       articulos: [
+         { codigo: 1,precio:12,descripcion: 'peras' },
+         { codigo: 2,precio:132,descripcion: 'manzanas' },
+         { codigo: 3,precio:23,descripcion: 'naranjas' },               
+       ],
+       descuento:{lunes:'5%',martes:'10%'}
+    };
+      
+ 	 res.render('index', datos);
+	});	
+
+
+//CARGAR VISTAS HTML CON PARAMETROS
+
+	app.use(express.static(__dirname + '/views'));
+	app.get('/',function(req,res){
+	    res.render('index',{nombre:"el nombre"});
+	});
+	// OBTENER EN VISTA -> <script>var name = "{{ nombre }}";console.log(name);</script>
+
+//RUTAS
+	-tomar parametros url=req.query.parametro;
+
+	//ESTATICA
+	app.get('/usuario', function (req, res) {
+		 res.render('index',{nombre:user});
+	  res.send(req.params)
+	})
+	//PARAMETRO
+	app.get('/usuario/:userId', function (req, res) {
+	  var user = req.param('userId');
+	  res.render('index',{nombre:user});
+	})
+	//PARAMETROS Y REFERENCIA
+	app.get('/usuario/:userId/libro/:bookId', function (req, res) {
+	  res.send(req.params)
+	})
+
+	//parametros
+
+	router.get('/usuario/:userId', function (req, res) {
+	  var user = req.param('userId');
+	  res.render('index',{nombre:user});
+	})
+	//PARAMETROS Y REFERENCIA
+	router.get('/usuario/:userId/libro/:bookId', function (req, res) {
+	  res.send(req.params)
+	})
+
+	router.get('/modul(es)?some',function(req,res,next){
+		//lo del parentesis es opcional en la ruta..funcionara con /mudul o modules
+	})
+	router.get('/module?some',function(req,res,next){
+		//la "e" sera opcional
+	})
+
+	router.get('/module*some',function(req,res,next){
+		//aceptara cualquier cosa entre module y some
+	})
+
+	router.get(/.*fly$/, function(req, res, next)
+	{
+	   //cualquier ruta que termine con "fly"
+	});
+
+	//ruta que donde si hay una "a" se ejecutara
+	router.get(/a/, function(req, res, next)
+	{
+	    res.send('/a/');
+	});
+
+
+	//esta ruta tiene mas de un manejador
+		router.get('/check/*', function (req, res, next)
+		{
+		    console.log('comprueba alguna cosa');
+		    next();//segimos
+		},
+		function (req, res)
+		{	//otra accion
+		    res.send('La comprobación ha pasado');
+		});
+	//tambien podemos pasarle varios manejadores a una ruta con un array de funciones como parametro
+
+		var Check0 = function (req, res, next)
+		{
+		    console.log('Check0');
+		    next();
+		}
+
+		var Check1 = function (req, res, next)
+		{
+		    console.log('Check1');
+		    next();
+		}
+
+		var Check2 = function (req, res, next)
+		{
+		    res.send('Check2');
+		}
+		//procesa Check0, Check1 y finalmente Check2 envia la respuesta al navegador
+		router.get('/multicheck/*', [Check0, Check1, Check2]);
+	
+//CARGAR LAYOUT(HEADER,BODY,FOOTER)
+	app.get('/index', function (req, res) {
+	  var base_url = req.headers.host+"/";
+	  res.render('index',{base_url:base_url});
+	})
+
+//COOKIES
+	cookie-parser
+	CREAR->res.cookie('mail', req.body.mail,{ expires: new Date(Date.now() + (60*60*24*365*3)) });
+	LEER->req.cookies.mail
+//LEER PARAMETROS POST
+	//--npm install body-parser --save
+		
+	var bodyParser = require("body-parser");
+	app.use(bodyParser.json());//application/json
+	app.use(bodyParser.urlencoded({extended:true}));//application/json
+
+	app.get('/formlogin', function (req, res) {
+	  var base_url = req.headers.host+"/";
+	  res.render('login',{base_url:base_url});
+	})
+
+	app.post('/login', function (req, res) {
+	  console.log(req.body.usuario);
+	  res.send("form enviado");
+	})
+
+//sessiones
+
+	var session = require('express-session');
+	var cookieParser = require('cookie-parser');
+	app.use(session({secret: '123456', resave: true, saveUninitialized: true}));
+	req.session.mail=req.body.mail;
+	req.session.mail
+   ---------------------------------------
+	npm install express-session --save
+	modulo->var sessions=require("express-session")
+	-app.use(sessions({secret:'<ug1pbm*{5}ZR>M4Sp}2tje1*Q"5NW'}));
+	crear->req.session.username= algo
+	usar->username:req.session.username
+	destruir->req.session.destroy;
+
+	-sessiones flash
+	modulo-> var flash=require("connect-flash") -> app.use(flash())
+	crear req.flash("info","algo");
+	usar re.flash("info")
+
+-MYSQL
+	npm install mysql --save
+	model
+
+	--CONEXION
+		var mysql = require("mysql");
+
+		connection = mysql.createConnection({
+		    host: "localhost",
+		    user: "root",
+		    password: '',
+		    database: "node"
+		});
+
+		module.exports = User;
+
+	var User = {};
+
+	--INSERT
+		User.insert = function(userData, callback)
+		{
+		    if(connection)
+		    {
+		        connection.query("INSERT INTO usuarios SET ?", userData, function(error, result)
+		        {
+		            if(error)
+		            {
+		                throw error;
+		            }
+		            else
+		            {
+		                return callback(null, result.insertId);
+		            }
+		        })
+		    }
+		}
+		controller
+		var User = require("../../models/front_end/usuariosbdmodel");
+
+		var userData =  {
+	                id: null,
+	                rut: req.body.rut,
+	    };
+
+	    User.insert(userData, function(error, data) {
+	    if(data){}
+
+	--GETONE
+	    User.findOne = function(username, password, callback){
+	    if(connection)
+	    {
+	        connection.query("SELECT * FROM usuarios WHERE rut = " + connection.escape(username) + " AND contrasena = " + connection.escape(password),
+	        function(error, rows)
+	        {
+	            if(error)
+	            {
+	                throw error;
+	            }
+	            else
+	            {
+	                if(rows.length === 0)
+	                {
+	                    return callback(null, null);
+	                }
+	                return callback(null, rows[0]);
+	            }
+	        })
+	    }
+		}
+		
+-variables globales?
+
+	//debe estar creado en alguna parte
+	app.use(function(req, res, next)
+	{
+	    res.locals.user = req.user;
+	    next();
+	});
+
+	uso->req.user.id//
+
+-passport login , sessions
+	npm install express-session passport passport-local connect-flash --save
+	//CREACION
+		var cookieParser = require('cookie-parser');
+		var sessions=require("express-session")
+		var flash = require('connect-flash');
+		var passport = require("passport");
+		var localStrategy = require("passport-local").Strategy;
+		app.use(sessions({
+		    /*genid: function(req) {
+		      return genuuid() // use UUIDs for session IDs
+		    },*/
+		    secret: '<ug1pbm*{5}>M4Sfp}2tjae1*Q"5NW',
+		    name: "sessionp",
+		    //store: sessionStore, // connect-mongo session store
+		    //proxy: true,
+		    resave: false,
+		    saveUninitialized: true,
+		    //cookie: { maxAge: 30000 }
+		  }));
+		app.use(flash());
+		app.use(passport.initialize());
+		app.use(passport.session());
+
+   	//IMPLEMENTACION
+		var passport = require("passport");
+		var LocalStrategy = require("passport-local").Strategy;
+		passport.serializeUser(function(user, done){ done(null, user);});
+		passport.deserializeUser(function(user, done){done(null, user);});
+		//FUNCION Q VALIDA SI EXISTE AUTENTICACION, SE INYECTA COMO PARAMENTRO
+			function requireAuth(req,res,next){
+			        if(!req.isAuthenticated()){
+			            req.flash("error","No tienes acceso a esta zona");
+			            res.redirect("/");
+			        }
+			        next();
+			    }
+		//CREA LOGIN    
+		 	passport.use(new LocalStrategy(function(user, pass, done) {
+		            Login.log(user, pass, function(error, user){
+		                if(error) {
+		                    console.log(error);
+		                }
+		                if(!user){
+		                    return done(null, false, { message: "El usuario no ha sido encontrado"});
+		                }
+		                return done(null, user);
+		            })
+		        }
+		    ))
+		    //GET ONE
+				Login.log = function(username, password, callback){
+				    if(connection){
+				        connection.query("SELECT rut as user,contrasena as pass FROM usuarios WHERE rut = " + connection.escape(username) + " AND contrasena = " + connection.escape(password),
+				        function(error, rows){
+				            if(error){
+				                throw error;
+				            }else{
+				                if(rows.length === 0){
+				                    return callback(null, null);
+				                }
+				                return callback(null, rows[0]);
+				            }
+				        })
+				    }
+				} 
+
+	//USER ES EL OBJETO QUE CREA EL PASSPORT, EN ESTE CASO LOS DATOS DE LA BD, 
+	 router.post("/", passport.authenticate('local', { failureRedirect: '/', failureFlash : true }), function(req, res){
+       res.redirect("/home");
+    })
+
+	router.post("/", passport.authenticate('local', { failureRedirect: '/', failureFlash : true }), function(req, res){
+       res.redirect("/home");
+    })
+
+	router.get("/logout", requireAuth, function(req, res, next){
+         if(req.user){
+            req.logout();
+         }
+         res.render("./front_end/login/formlogin", {
+             title: 'Login', message: "Sesión cerrada correctamente." 
+         });
+    })
+
+    router.get('/', requireAuth ,function(req, res, next){
+    res.render('./front_end/home/home', { 
+    	title: 'Home',
+    	usuario:req.user.user
+    });
+	});
+
+	
+
+
+
+
+
+
+
+
