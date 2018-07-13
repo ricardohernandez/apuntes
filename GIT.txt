@@ -72,7 +72,10 @@ GIT - GITHUB
 		  	  git clone --bare https://github.com/ricardohernandez/portafolio.git
 
 			git remote add pb https://github.com/paulboone/ticgit -> agrega otro repositorio
-						
+		   diferencias 
+		   
+		   git diff --name-only HEAD~3 HEAD
+
 
 	-COMANDOS
 	    git log
