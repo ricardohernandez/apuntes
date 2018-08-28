@@ -12,6 +12,33 @@
 	
 	mysql> set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION';
 		
+-SUBQUERYS
+
+SELECT n.id as id_noticia,n.nombre as noticia,
+(SELECT COUNT(*) FROM noticias_megusta nm WHERE nm.id_noticia=n.id) AS megusta, 
+(SELECT COUNT(*) FROM noticias_nomegusta nnm WHERE nnm.id_noticia=n.id) AS nomegusta 
+from noticias as n
+
+
+SELECT co.*, 
+    COALESCE(nm.cantidadm,0) AS cantidadm,
+    COALESCE(nmm.cantidadnm,0) AS cantidadnm
+FROM noticias AS co
+LEFT JOIN (
+        SELECT COUNT(*) AS cantidadm, id_noticia AS id_noticia 
+        FROM noticias_megusta
+        GROUP BY id_noticia
+    ) AS nm
+    ON nm.id_noticia = co.id
+LEFT JOIN (
+        SELECT COUNT(*) AS cantidadnm, id_noticia AS id_noticia 
+        FROM noticias_nomegusta
+        GROUP BY id_noticia
+    ) AS nmm
+    ON nmm.id_noticia = co.id
+    
+    
+
 -REPLACE
 	update actividades_movistar SET precio_target=TRIM(REPLACE(REPLACE(REPLACE(REPLACE(precio_target, '-', ' ') , '$', ' ') , '.', ' ') , ' ', ''))
 
