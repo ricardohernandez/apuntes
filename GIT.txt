@@ -53,12 +53,12 @@ GIT - GITHUB
 				git remote add origin git@github.com:ricardohernandez/mantencion30.git
  				git remote -v -> lista repositorios remotos y su url
 
-			push
+			push // actualizar cambios en el repo remoto
 			  git pull origin master //pull down changes from the origin repository as follows before you can push
 		  	  git push -u origin master
 		  	  git push -f origin master	
 
-		    pull
+		    pull // actualizar repo local al mas commit mas nuevo
 		      -para hacer copia de proyecto desde otro usuario, debe estar agregado y aceptado como colaborador para tener permiso de escritura.
 		      git pull origin master
 		      -en caso de error urelated
@@ -75,7 +75,16 @@ GIT - GITHUB
 		   diferencias 
 		   
 		   git diff --name-only HEAD~3 HEAD
-
+		
+	-CREAR ALIAS A COMMITS 
+	
+		git tag 1.0.0 1b2e1d63ff //version 1.0.0 al commit id
+		git log
+		
+	-DESHACER CAMBIOS
+	
+		git fetch origin
+		git reset --hard origin/master
 
 	-COMANDOS
 	    git log
